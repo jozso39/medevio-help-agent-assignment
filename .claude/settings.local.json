@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install cheerio turndown)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
