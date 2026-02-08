@@ -5,62 +5,6 @@ import TurndownService from 'turndown';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-const linkSchema = z.object({
-  url: z.string(),
-  title: z.string(),
-});
-
-const linksArraySchema = z.array(linkSchema);
-
-// Step 1: Fetch index page and extract article links
-const fetchArticleLinks = createStep({
-  id: 'fetch-article-links',
-  description: 'Fetches the index page and extracts all article links',
-  inputSchema: z.object({
-    indexUrl: z.string().describe('The URL of the index page to scrape'),
-    baseUrl: z.string().describe('The base URL for resolving relative links'),
-  }),
-  outputSchema: z.object({
-    links: linksArraySchema,
-    baseUrl: z.string(),
-  }),
-  execute: async ({ inputData }) => {
-    if (!inputData) {
-      throw new Error('Input data not found');
-    }
-
-    const response = await fetch(inputData.indexUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch index page: ${response.status} ${response.statusText}`);
-    }
-
-    const html = await response.text();
-    const $ = cheerio.load(html);
-
-    const links: { url: string; title: string }[] = [];
-
-    // Find all article links in the folder listing
-    $('a.c-link').each((_, element) => {
-      const href = $(element).attr('href');
-      const title = $(element).text().trim();
-
-      if (href && title && href.includes('/support/solutions/articles/')) {
-        const fullUrl = href.startsWith('http') ? href : `${inputData.baseUrl}${href}`;
-        links.push({ url: fullUrl, title });
-      }
-    });
-
-    if (links.length === 0) {
-      throw new Error('No article links found on the index page');
-    }
-
-    return {
-      links,
-      baseUrl: inputData.baseUrl,
-    };
-  },
-});
-
 // Helper function to sanitize filename
 function sanitizeFilename(title: string): string {
   return title
@@ -77,29 +21,80 @@ function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Step 2: Process all articles (fetch, convert, save)
-const processArticles = createStep({
-  id: 'process-articles',
-  description: 'Fetches each article, converts to Markdown, and saves to files',
+// Step 1: Pass through the URLs array (required for foreach)
+const prepareUrls = createStep({
+  id: 'prepare-urls',
+  description: 'Prepares the array of index URLs for parallel processing',
   inputSchema: z.object({
-    links: linksArraySchema,
-    baseUrl: z.string(),
+    indexUrls: z.array(z.string()).describe('Array of index page URLs to scrape'),
   }),
-  outputSchema: z.object({
-    processed: z.number(),
-    files: z.array(z.string()),
-  }),
+  outputSchema: z.array(z.string()),
   execute: async ({ inputData }) => {
     if (!inputData) {
       throw new Error('Input data not found');
     }
+    return inputData.indexUrls;
+  },
+});
 
+// Step 2: Process a single index URL (fetches links + processes articles)
+const processIndexUrl = createStep({
+  id: 'process-index-url',
+  description: 'Fetches an index page, extracts article links, and processes all articles',
+  inputSchema: z.string(),
+  outputSchema: z.object({
+    indexUrl: z.string(),
+    processed: z.number(),
+    files: z.array(z.string()),
+  }),
+  execute: async ({ inputData: indexUrl }) => {
+    if (!indexUrl) {
+      throw new Error('Index URL not provided');
+    }
+
+    // Parse base URL
+    const parsedUrl = new URL(indexUrl);
+    const baseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+
+    // Fetch index page
+    const indexResponse = await fetch(indexUrl);
+    if (!indexResponse.ok) {
+      throw new Error(`Failed to fetch index page: ${indexResponse.status} ${indexResponse.statusText}`);
+    }
+
+    const indexHtml = await indexResponse.text();
+    const $index = cheerio.load(indexHtml);
+
+    // Extract article links
+    const links: { url: string; title: string }[] = [];
+
+    $index('a.row').each((_, element) => {
+      const href = $index(element).attr('href');
+      const title = $index(element).find('.col-md-8 .line-clamp-2').text().trim();
+
+      if (href && title && href.includes('/support/solutions/articles/')) {
+        const fullUrl = href.startsWith('http') ? href : `${baseUrl}${href}`;
+        links.push({ url: fullUrl, title });
+      }
+    });
+
+    if (links.length === 0) {
+      console.warn(`No article links found on index page: ${indexUrl}`);
+      return {
+        indexUrl,
+        processed: 0,
+        files: [],
+      };
+    }
+
+    console.log(`Found ${links.length} articles on: ${indexUrl}`);
+
+    // Setup turndown service
     const turndownService = new TurndownService({
       headingStyle: 'atx',
       codeBlockStyle: 'fenced',
     });
 
-    // Configure turndown to handle images better
     turndownService.addRule('images', {
       filter: 'img',
       replacement: (_, node) => {
@@ -119,7 +114,8 @@ const processArticles = createStep({
     const files: string[] = [];
     let processed = 0;
 
-    for (const link of inputData.links) {
+    // Process each article
+    for (const link of links) {
       try {
         // Add delay to avoid overwhelming the server
         if (processed > 0) {
@@ -144,8 +140,6 @@ const processArticles = createStep({
 
         // Remove unwanted elements
         contentElement.find('script, style, noscript').remove();
-
-        // Remove inline styles
         contentElement.find('[style]').removeAttr('style');
 
         // Get the cleaned HTML
@@ -183,25 +177,54 @@ scraped_at: "${new Date().toISOString()}"
     }
 
     return {
+      indexUrl,
       processed,
       files,
     };
   },
 });
 
+// Step 3: Aggregate results from all URLs
+const aggregateResults = createStep({
+  id: 'aggregate-results',
+  description: 'Combines results from all processed index URLs',
+  inputSchema: z.array(
+    z.object({
+      indexUrl: z.string(),
+      processed: z.number(),
+      files: z.array(z.string()),
+    })
+  ),
+  outputSchema: z.object({
+    totalProcessed: z.number(),
+    allFiles: z.array(z.string()),
+  }),
+  execute: async ({ inputData: results }) => {
+    if (!results) {
+      throw new Error('Results not found');
+    }
+
+    return {
+      totalProcessed: results.reduce((sum, r) => sum + r.processed, 0),
+      allFiles: results.flatMap(r => r.files),
+    };
+  },
+});
+
+// Workflow with foreach
 const docsScraperWorkflow = createWorkflow({
   id: 'docs-scraper-workflow',
   inputSchema: z.object({
-    indexUrl: z.string().describe('The URL of the documentation index page'),
-    baseUrl: z.string().describe('The base URL for resolving relative links'),
+    indexUrls: z.array(z.string()).describe('Array of documentation index page URLs'),
   }),
   outputSchema: z.object({
-    processed: z.number(),
-    files: z.array(z.string()),
+    totalProcessed: z.number(),
+    allFiles: z.array(z.string()),
   }),
 })
-  .then(fetchArticleLinks)
-  .then(processArticles);
+  .then(prepareUrls)
+  .foreach(processIndexUrl, { concurrency: 2 })
+  .then(aggregateResults);
 
 docsScraperWorkflow.commit();
 
