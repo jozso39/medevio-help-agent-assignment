@@ -8,3 +8,5 @@ dist
 *.db
 *.db-*
 output/docs
+mastra.db
+.mcp.json
