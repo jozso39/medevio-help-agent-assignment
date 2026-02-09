@@ -62,7 +62,7 @@ Máš přístup k nástrojům pro správu úkolů v ClickUpu. Tvůj workflow pro
 **User:** "Ok, super. Je na to už task?"
 **Ty:** (Zavoláš \`get all tasks\`, projdeš JSON). "Ano, našel jsem úkol **'Import dat'**, který je ve stavu 'to do'. Je to podúkol k 'Initial task'."
   `,
-  model: 'google/gemini-2.5-flash',
+  model: 'openai/gpt-4.1-mini',
   tools: {
     // Medevio knowledge search (RAG via LibSQL vector store)
     medevioKnowledgeTool,
