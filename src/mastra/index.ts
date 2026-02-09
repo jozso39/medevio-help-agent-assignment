@@ -3,11 +3,8 @@ import { Mastra } from '@mastra/core/mastra';
 import { PinoLogger } from '@mastra/loggers';
 import { LibSQLStore } from '@mastra/libsql';
 import { Observability, DefaultExporter, CloudExporter, SensitiveDataFilter } from '@mastra/observability';
-import { weatherWorkflow } from './workflows/weather-workflow';
 import { docsScraperWorkflow } from './workflows/docs-scraper-workflow';
-import { weatherAgent } from './agents/weather-agent';
 import { medevioHelpAgent } from './agents/medevio-help-agent';
-import { toolCallAppropriatenessScorer, completenessScorer, translationScorer } from './scorers/weather-scorer';
 import {
   medevioCompletenessScorer,
   topicalAlignmentScorer,
@@ -15,10 +12,9 @@ import {
 } from './scorers/medevio-scorer';
 
 export const mastra = new Mastra({
-  workflows: { weatherWorkflow, docsScraperWorkflow },
-  agents: { weatherAgent, medevioHelpAgent },
+  workflows: { docsScraperWorkflow },
+  agents: { medevioHelpAgent },
   scorers: {
-    toolCallAppropriatenessScorer, completenessScorer, translationScorer,
     medevioCompletenessScorer, topicalAlignmentScorer, czechLanguageQualityScorer,
   },
   storage: new LibSQLStore({
