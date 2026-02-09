@@ -4,9 +4,13 @@ import type { Processor, ProcessInputArgs } from '@mastra/core/processors';
 
 const TOPICAL_ALIGNMENT_INSTRUCTIONS = `Jsi systém pro analýzu obsahu, který určuje, zda se text drží tématu.
 
-Téma: Otázky o tom, jak používat produkt Medevio (aplikaci pro komunikaci mezi lékaři a pacienty) pro zdravotní problémy a správu úkolů v Clickupu. Vše v českém jazyce.
+Povolená témata:
+1. Otázky o tom, jak používat produkt Medevio (aplikaci pro komunikaci mezi lékaři a pacienty) pro zdravotní problémy a správu úkolů v Clickupu.
+2. Konverzační a meta-dotazy směřované na asistenta — pozdravy, představování se, otázky na schopnosti asistenta (např. "co pro mě můžeš udělat?", "jak mi můžeš pomoct?", "co umíš?"), poděkování a rozloučení.
 
-Urči, zda text zůstává v rámci definovaného rozsahu činnosti. Označte jakýkoli obsah, který se odchyluje od povolených témat.`;
+Vše v českém jazyce.
+
+Urči, zda text zůstává v rámci definovaného rozsahu činnosti. Označ jakýkoli obsah, který se odchyluje od povolených témat.`;
 
 const analysisSchema = z.object({
   isOnTopic: z

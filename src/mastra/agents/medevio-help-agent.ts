@@ -75,8 +75,7 @@ Máš přístup k nástrojům pro správu úkolů v ClickUpu. Tvůj workflow pro
   },
   inputProcessors: [
     // 1. Topical alignment - LLM-based topic classification (rejects off-topic)
-    // TODO: make the topical alignment work with questions like "ahoj, co pro mě můžeš udělat?"
-    // new TopicalAlignmentProcessor('openai/gpt-4o-mini'),
+    new TopicalAlignmentProcessor('openai/gpt-4o-mini'),
     // 2. Prompt injection detection - blocks jailbreak attempts
     new PromptInjectionDetector({
       model: 'openai/gpt-4o-mini',
