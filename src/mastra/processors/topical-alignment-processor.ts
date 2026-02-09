@@ -55,8 +55,8 @@ export class TopicalAlignmentProcessor implements Processor {
 
     if (!result.object?.isOnTopic) {
       abort(
-        'Omlouvám se, ale mohu odpovídat pouze na otázky týkající se aplikace Medevio a správy úkolů v ClickUp. ' +
-          'Pokud máte dotaz ohledně Medevio, rád vám pomohu.',
+        'Omlouvám se, ale mohu odpovídat pouze na otázky týkající se aplikace Medevio a správy úkolů v ClickUp a pouze na otázky v češtině. ' +
+        'Pokud máte dotaz ohledně Medevio, rád vám pomohu.',
       );
     }
 
