@@ -27,6 +27,9 @@ interface ClickUpTask {
   description?: string;
 }
 
+const TASK_STATUSES = ['to do', 'in progress', 'complete'] as const;
+const statusEnum = z.enum(TASK_STATUSES);
+
 // Priority mapping: 1=urgent, 2=high, 3=normal, 4=low
 export const clickupCreateTask = createTool({
   id: 'clickup-create-task',
@@ -41,7 +44,7 @@ export const clickupCreateTask = createTool({
       .max(4)
       .optional()
       .describe('Priority: 1=urgent, 2=high, 3=normal, 4=low'),
-    status: z.string().optional().describe('Task status'),
+    status: statusEnum.optional().describe('Task status: "to do", "in progress", or "complete"'),
   }),
   outputSchema: z.object({
     id: z.string(),
@@ -82,7 +85,7 @@ export const clickupListTasks = createTool({
   id: 'clickup-list-tasks',
   description: 'List tasks from a ClickUp list. Optionally filter by status.',
   inputSchema: z.object({
-    status: z.string().optional().describe('Filter by status'),
+    status: statusEnum.optional().describe('Filter by status: "to do", "in progress", or "complete"'),
     page: z.number().optional().describe('Page number (0-indexed)'),
   }),
   outputSchema: z.object({
@@ -139,7 +142,7 @@ export const clickupUpdateTask = createTool({
       .max(4)
       .optional()
       .describe('New priority: 1=urgent, 2=high, 3=normal, 4=low'),
-    status: z.string().optional().describe('New task status'),
+    status: statusEnum.optional().describe('New task status: "to do", "in progress", or "complete"'),
   }),
   outputSchema: z.object({
     id: z.string(),
