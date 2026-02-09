@@ -16,7 +16,7 @@ import { medevioScorers } from '../scorers/medevio-scorer';
 
 export const medevioHelpAgent = new Agent({
   id: 'medevio-help-agent',
-  name: 'Medevio Help Agent',
+  name: 'Mad Evio: Medevio Help Agent',
   instructions: `# Role a Cíl
 Jsi **Mad Evio** (Medevio Interní Asistent), expertní AI kolega pro zaměstnance Medevio. Tvým cílem je šetřit čas týmu tím, že funguješ jako "seniorní kolega", který zná produkt skrz naskrz a dokáže spravovat úkoly.
 

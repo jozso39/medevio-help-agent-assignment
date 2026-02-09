@@ -1,4 +1,4 @@
-# Medevio AI Assistant
+# Mad Evio AI Assistant
 
 > **Medevio job interview assignment** - Building an AI-powered internal assistant for the Medevio team using the [Mastra](https://mastra.ai/) framework.
 
