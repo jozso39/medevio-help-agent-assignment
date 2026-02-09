@@ -35,7 +35,7 @@ src/mastra/
 └── public/
     └── output/docs/                  # Scraped Medevio help articles (Markdown), source for embedding workflow
 scripts/
-└── run-scraper.ts                    # Trigger docs scraper with napoveda.medevio.cz URLs
+└── scrape-and-embed.ts                    # Trigger docs scraper with napoveda.medevio.cz URLs
 ```
 
 ## Key Technical Details
@@ -82,7 +82,7 @@ The agent (`medevio-help-agent.ts`) uses Gemini 2.5 Flash, responds in Czech, an
 
 ## Docs Scraper Details
 
-The docs scraper workflow (`docs-scraper-workflow.ts`) processes multiple index URLs in parallel (concurrency: 2), extracts article links, scrapes each article with 500ms delays, converts HTML to Markdown via Turndown, and saves to `output/docs/` with frontmatter. The `scripts/run-scraper.ts` script triggers it with URLs from `napoveda.medevio.cz`.
+The docs scraper workflow (`docs-scraper-workflow.ts`) processes multiple index URLs in parallel (concurrency: 2), extracts article links, scrapes each article with 500ms delays, converts HTML to Markdown via Turndown, and saves to `output/docs/` with frontmatter. The `scripts/scrape-and-embed.ts` script triggers it with URLs from `napoveda.medevio.cz`.
 
 ## Embed Docs Workflow Details
 
