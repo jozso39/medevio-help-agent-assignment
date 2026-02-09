@@ -6,12 +6,21 @@ import { Observability, DefaultExporter, CloudExporter, SensitiveDataFilter } fr
 import { weatherWorkflow } from './workflows/weather-workflow';
 import { docsScraperWorkflow } from './workflows/docs-scraper-workflow';
 import { weatherAgent } from './agents/weather-agent';
+import { medevioHelpAgent } from './agents/medevio-help-agent';
 import { toolCallAppropriatenessScorer, completenessScorer, translationScorer } from './scorers/weather-scorer';
+import {
+  medevioCompletenessScorer,
+  topicalAlignmentScorer,
+  czechLanguageQualityScorer,
+} from './scorers/medevio-scorer';
 
 export const mastra = new Mastra({
   workflows: { weatherWorkflow, docsScraperWorkflow },
-  agents: { weatherAgent },
-  scorers: { toolCallAppropriatenessScorer, completenessScorer, translationScorer },
+  agents: { weatherAgent, medevioHelpAgent },
+  scorers: {
+    toolCallAppropriatenessScorer, completenessScorer, translationScorer,
+    medevioCompletenessScorer, topicalAlignmentScorer, czechLanguageQualityScorer,
+  },
   storage: new LibSQLStore({
     id: "mastra-storage",
     // stores observability, scores, ... into persistent file storage
