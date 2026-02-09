@@ -3,6 +3,12 @@ import { google } from '@ai-sdk/google';
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
+function getFileStoreId() {
+  const fileStoreId = process.env.GEMINI_FILE_SEARCH_API_STORE_ID;
+  if (!fileStoreId) throw new Error('GEMINI_FILE_SEARCH_API_STORE_ID is not set');
+  return fileStoreId;
+}
+
 // Internal Gemini agent with only fileSearch provider tool.
 // Kept separate from the main agent to avoid provider-defined tool conflicts
 // with regular Mastra tools (ClickUp CRUD).
@@ -15,7 +21,7 @@ const knowledgeAgent = new Agent({
   model: 'google/gemini-2.5-flash',
   tools: {
     fileSearch: google.tools.fileSearch({
-      fileSearchStoreNames: ['fileSearchStores/medevio-help-91bp9hd1r7d0'],
+      fileSearchStoreNames: [getFileStoreId()],
     }),
   },
 });
