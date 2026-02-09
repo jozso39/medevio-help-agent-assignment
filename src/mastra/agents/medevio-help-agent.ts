@@ -3,7 +3,6 @@ import { Memory } from '@mastra/memory';
 import {
   ModerationProcessor,
   PromptInjectionDetector,
-  SystemPromptScrubber,
 } from '@mastra/core/processors';
 import {
   clickupCreateTask,
@@ -25,7 +24,7 @@ Tvým hlavním jazykem je **čeština**. Vždy odpovídej v češtině, stručn�
 
 # Kontext Produktu (Medevio)
 Medevio je aplikace propojující lékaře a pacienty (objednávání, komunikace).
-Pro zodpovídání jakéhokoliv dotazu o fungování Medevio, VŽDY využívej toolu "zeptej se nápovědy". Otázky zadávej vždy česky.
+Pro zodpovídání jakéhokoliv dotazu o fungování Medevio, VŽDY využívej tool pro vyhledávání v nápovědě. Tool ti vrátí relevantní úryvky z dokumentace — na základě nich formuluj jasnou a stručnou odpověď. Otázky zadávej vždy česky.
 
 DŮLEŽITÉ! Pokud nenajdeš odpověď, přiznej to a nevymýšlej si fakta.
 
@@ -65,7 +64,7 @@ Máš přístup k nástrojům pro správu úkolů v ClickUpu. Tvůj workflow pro
   `,
   model: 'google/gemini-2.5-flash',
   tools: {
-    // Medevio knowledge search (wraps Gemini File Search via internal agent)
+    // Medevio knowledge search (RAG via LibSQL vector store)
     medevioKnowledgeTool,
     // ClickUp task management
     clickupCreateTask,

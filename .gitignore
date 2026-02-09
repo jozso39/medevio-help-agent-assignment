@@ -10,3 +10,4 @@ dist
 output/docs
 mastra.db
 .mcp.json
+src/mastra/public/output/docs

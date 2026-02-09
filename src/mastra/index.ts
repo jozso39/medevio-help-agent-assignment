@@ -4,7 +4,9 @@ import { PinoLogger } from '@mastra/loggers';
 import { LibSQLStore } from '@mastra/libsql';
 import { Observability, DefaultExporter, CloudExporter, SensitiveDataFilter } from '@mastra/observability';
 import { docsScraperWorkflow } from './workflows/docs-scraper-workflow';
+import { embedDocsWorkflow } from './workflows/embed-docs-workflow';
 import { medevioHelpAgent } from './agents/medevio-help-agent';
+import { libsqlVector } from './vector-store';
 import {
   medevioCompletenessScorer,
   topicalAlignmentScorer,
@@ -12,11 +14,12 @@ import {
 } from './scorers/medevio-scorer';
 
 export const mastra = new Mastra({
-  workflows: { docsScraperWorkflow },
+  workflows: { docsScraperWorkflow, embedDocsWorkflow },
   agents: { medevioHelpAgent },
   scorers: {
     medevioCompletenessScorer, topicalAlignmentScorer, czechLanguageQualityScorer,
   },
+  vectors: { libsqlVector },
   storage: new LibSQLStore({
     id: "mastra-storage",
     // stores observability, scores, ... into persistent file storage
