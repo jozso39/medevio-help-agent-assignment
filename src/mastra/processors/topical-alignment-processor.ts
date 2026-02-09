@@ -5,8 +5,9 @@ import type { Processor, ProcessInputArgs } from '@mastra/core/processors';
 const TOPICAL_ALIGNMENT_INSTRUCTIONS = `Jsi systém pro analýzu obsahu, který určuje, zda se text drží tématu.
 
 Povolená témata:
-1. Otázky o tom, jak používat produkt Medevio (aplikaci pro komunikaci mezi lékaři a pacienty) pro zdravotní problémy a správu úkolů v Clickupu.
-2. Konverzační a meta-dotazy směřované na asistenta — pozdravy, představování se, otázky na schopnosti asistenta (např. "co pro mě můžeš udělat?", "jak mi můžeš pomoct?", "co umíš?"), poděkování a rozloučení.
+1. Cokoliv související s produktem Medevio — aplikací pro komunikaci mezi lékaři a pacienty. To zahrnuje: objednávání, léčebné plány, zprávy, recepty, e-neschopenky, notifikace, nastavení ordinace, import pacientů, fakturace, a jakékoliv další funkce či procesy v Medeviu. Dotaz nemusí výslovně zmiňovat "Medevio" — pokud se týká zdravotnictví, komunikace lékař-pacient nebo funkcí typických pro takovou aplikaci, je on-topic.
+2. Správa úkolů v ClickUpu (vytváření, úprava, mazání, dotazy na úkoly).
+3. Konverzační a meta-dotazy směřované na asistenta — pozdravy, představování se, otázky na schopnosti asistenta (např. "co pro mě můžeš udělat?", "jak mi můžeš pomoct?", "co umíš?"), poděkování a rozloučení.
 
 Vše v českém jazyce.
 
