@@ -41,7 +41,6 @@ Then edit `.env` with your values:
 | `OPENAI_API_KEY` | Yes | OpenAI key (RAG embeddings, scorers, guardrail processors) |
 | `CLICKUP_API_KEY` | Yes | ClickUp API key — provided by the author |
 | `CLICKUP_LIST_ID` | Yes | Target ClickUp list ID — provided by the author |
-| `MASTRA_CLOUD_ACCESS_TOKEN` | No | Mastra Cloud traces |
 
 > `CLICKUP_API_KEY` and `CLICKUP_LIST_ID` are tied to the author's ClickUp workspace. Ask the author for these values.
 
@@ -72,28 +71,6 @@ This will scrape all help articles from `napoveda.medevio.cz`, chunk them, and e
 ```bash
 npm run build        # Build production server
 npm start            # Start production server
-```
-
-## Project Structure
-
-```
-src/mastra/
-├── index.ts                           # Mastra config (agents, workflows, scorers, storage, vectors, observability)
-├── vector-store.ts                    # Shared LibSQLVector instance + constants
-├── agents/medevio-help-agent.ts       # Medevio Help Agent (Gemini 2.5 Flash, memory, guardrails, evals)
-├── tools/
-│   ├── clickup-tools.ts               # ClickUp CRUD tools
-│   └── medevio-knowledge-tool.ts      # RAG knowledge search via LibSQL vector store
-├── processors/
-│   └── topical-alignment-processor.ts # LLM-based topic classifier
-├── scorers/medevio-scorer.ts          # Completeness, topical alignment, Czech language quality
-├── workflows/
-│   ├── docs-scraper-workflow.ts       # Scrape help docs + chunk + embed into vector store
-│   └── embed-docs-workflow.ts         # Embed existing Markdown docs into vector store
-└── public/
-    └── output/docs/                   # Scraped Medevio help articles (Markdown)
-scripts/
-└── scrape-and-embed.ts                # Scrape docs + embed into vector store via CLI
 ```
 
 ## Tech Stack
