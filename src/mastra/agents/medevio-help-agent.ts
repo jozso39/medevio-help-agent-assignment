@@ -1,5 +1,4 @@
 import { Agent } from '@mastra/core/agent';
-import { google } from '@ai-sdk/google';
 import { Memory } from '@mastra/memory';
 import {
   ModerationProcessor,
@@ -12,6 +11,7 @@ import {
   clickupUpdateTask,
   clickupDeleteTask,
 } from '../tools/clickup-tools';
+import { medevioKnowledgeTool } from '../tools/medevio-knowledge-tool';
 import { TopicalAlignmentProcessor } from '../processors/topical-alignment-processor';
 import { medevioScorers } from '../scorers/medevio-scorer';
 
@@ -65,19 +65,18 @@ Máš přístup k nástrojům pro správu úkolů v ClickUpu. Tvůj workflow pro
   `,
   model: 'google/gemini-2.5-flash',
   tools: {
-    // Gemini File Search Store - provider-defined tool for knowledge grounding
-    fileSearch: google.tools.fileSearch({
-      fileSearchStoreNames: ['fileSearchStores/medevio-help-91bp9hd1r7d0'],
-    }),
+    // Medevio knowledge search (wraps Gemini File Search via internal agent)
+    medevioKnowledgeTool,
     // ClickUp task management
     clickupCreateTask,
     clickupListTasks,
     clickupUpdateTask,
-    clickupDeleteTask,
+    clickupDeleteTask
   },
   inputProcessors: [
     // 1. Topical alignment - LLM-based topic classification (rejects off-topic)
-    new TopicalAlignmentProcessor('openai/gpt-4o-mini'),
+    // TODO: make the topical alignment work with questions like "ahoj, co pro mě můžeš udělat?"
+    // new TopicalAlignmentProcessor('openai/gpt-4o-mini'),
     // 2. Prompt injection detection - blocks jailbreak attempts
     new PromptInjectionDetector({
       model: 'openai/gpt-4o-mini',
@@ -91,14 +90,6 @@ Máš přístup k nástrojům pro správu úkolů v ClickUpu. Tvůj workflow pro
       categories: ['hate', 'harassment', 'violence', 'self-harm', 'swearing'],
       threshold: 0.7,
       strategy: 'block',
-    }),
-  ],
-  outputProcessors: [
-    // Prevent system prompt leakage in responses
-    new SystemPromptScrubber({
-      model: 'openai/gpt-4o-mini',
-      strategy: 'redact',
-      customPatterns: ['system prompt', 'systemový prompt', 'instrukce'],
     }),
   ],
   scorers: {
