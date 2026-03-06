@@ -4,6 +4,7 @@ import { PinoLogger } from '@mastra/loggers';
 import { LibSQLStore } from '@mastra/libsql';
 import { Observability, DefaultExporter, CloudExporter, SensitiveDataFilter } from '@mastra/observability';
 import { docsScraperWorkflow } from './workflows/docs-scraper-workflow';
+import { docsScraperWorkflowV2 } from './workflows/docs-scraper-workflow-v2';
 import { embedDocsWorkflow } from './workflows/embed-docs-workflow';
 import { medevioHelpAgent } from './agents/medevio-help-agent';
 import { libsqlVector } from './vector-store';
@@ -14,7 +15,7 @@ import {
 } from './scorers/medevio-scorer';
 
 export const mastra = new Mastra({
-  workflows: { docsScraperWorkflow, embedDocsWorkflow },
+  workflows: { docsScraperWorkflow, docsScraperWorkflowV2, embedDocsWorkflow },
   agents: { medevioHelpAgent },
   scorers: {
     medevioCompletenessScorer, topicalAlignmentScorer, czechLanguageQualityScorer,
